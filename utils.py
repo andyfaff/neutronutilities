@@ -22,13 +22,21 @@ def qcalc(angle, wavelength):
     '''
     return 4 * np.pi * np.sin(angle * np.pi / 180) / wavelength
 
-def wavelength(q, theta):
+def wavelength(q, angle):
     '''
-    calculate Q given angle of incidence and wavelength
+    calculate wavelength given Q vector and angle
+    q - wavevector (A^-1)
     angle - angle of incidence (degrees)
+    '''
+    return  4. * np.pi * np.sin(angle * np.pi / 180.)/q
+
+def angle(q, wavelength):
+    '''
+    calculate angle given Q and wavelength
+    q - wavevector (A^-1)
     wavelength -  wavelength of radiation (Angstrom)
     '''
-    return  4. * np.pi * np.sin(theta * np.pi / 180.)/q
+    return  np.asin(q / 4. / np.pi * wavelength) * 180 / np.pi
     
 def qcrit(SLD1, SLD2):
     '''
