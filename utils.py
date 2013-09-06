@@ -40,5 +40,8 @@ def angle(q, wavelength):
     
 def qcrit(SLD1, SLD2):
     '''
+    calculate critical Q vector given SLD of super and subphases
+    SLD1 - SLD of superphase (10^-6 A^-2)
+    SLD2 - SLD of subphase (10^-6 A^-2)
     '''
-    return np.sqrt(16. * np.pi * (SLD2 - SLD1))
+    return np.sqrt(16. * np.pi * (SLD2 - SLD1) * 1.e-6)
