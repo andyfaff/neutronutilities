@@ -19,15 +19,13 @@ Andrew Nelson - 2013
 '''
 
 #slit1-slit2 distance (mm)
-L12 = 1402.6
+L12 = 2859.5
 #slit2 - sample distance (mm)
-L2S = 330.2
+L2S = 276
 #sample - S5 distance (mm)
-LS5 = 266.7
-#sample - S6 distance (mm)
-LS6 = 1155.7
-#sample detector (mm) - from ANDR paper
-LSD = 1358
+LS4 = 290.5
+#sample detector (mm)
+LSD = 2500
 
 def height_of_beam_after_d2(d1, d2, distance):
     '''
@@ -91,16 +89,14 @@ def slitoptimiser(footprint, resolution, angle = 1.):
         print 'You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.'
 
     
-    height_at_S5 = height_of_beam_after_d2(d1, d2, L2S + LS5)
-    height_at_S6 = height_of_beam_after_d2(d1, d2, L2S + LS6)
+    height_at_S4 = height_of_beam_after_d2(d1, d2, L2S + LS4)
     height_at_detector = height_of_beam_after_d2(d1, d2, L2S + LSD)
     actual_footprint = height_of_beam_after_d2(d1, d2, L2S) / (angle * np.pi / 180)
 
     print '\nd1', d1, 'mm'
     print 'd2', d2, 'mm'
     print '\nfootprint:', actual_footprint, 'mm'
-    print 'height at S5:', height_at_S5, 'mm'
-    print 'height at S6:', height_at_S6, 'mm'
+    print 'height at S4:', height_at_S4, 'mm'
     print 'height at detector:', height_at_detector, 'mm'
     print '\n[d2star', optimal_d2star, ']'
     print '_____________________________________________'
@@ -110,4 +106,5 @@ if __name__ == '__main__':
         print 'Usage:\n\
             python slitoptimiser.py footprint relative_resolution [angle]\n\
             python slitoptimiser.py 50 0.04 [2]'
-    slitoptimiser(*[float(val) for val in sys.argv[1:]])
+    else:
+        slitoptimiser(*[float(val) for val in sys.argv[1:]])
