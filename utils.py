@@ -1,6 +1,9 @@
 #!/usr/bin/python
 from __future__ import division
 import numpy as np
+import scipy.stats as ss
+import scipy.integrate as spi
+
 import sys
 
 def div(d1, d2, angle, L12 = 2859):
@@ -45,3 +48,42 @@ def qcrit(SLD1, SLD2):
     SLD2 - SLD of subphase (10^-6 A^-2)
     '''
     return np.sqrt(16. * np.pi * (SLD2 - SLD1) * 1.e-6)
+    
+def xraylam(energy):
+    '''
+    convert energy (keV) to wavelength (angstrom)
+    '''
+    return 12.398/ energy
+    
+def xrayenergy(wavelength):
+    '''
+    convert energy (keV) to wavelength (angstrom)
+    '''
+    return 12.398/ wavelength
+    
+def beamfrac(FWHM, length, angle):
+    '''
+    return the beam fraction intercepted by a sample of length length
+    at sample tilt angle.
+    The beam is assumed to be gaussian, with a FWHM of FWHM.
+    '''
+    height_of_sample = length * np.sin(np.radians(angle))
+    beam_sd = FWHM / 2 / np.sqrt(2 * np.log(2))
+    probability = 2. * (ss.norm.cdf(height_of_sample / 2. / beam_sd) - 0.5)
+    return probability
+    
+def beamfrackernel(kernelx, kernely, length, angle):
+    '''
+    return the beam fraction intercepted by a sample of length length
+    at sample tilt angle.
+    The beam has the shape 'kernel', a 2 row array, which gives the PDF for the beam
+    intensity as a function of height. The first row is position, the second row is
+    probability at that position
+    '''
+    height_of_sample = length * np.sin(np.radians(angle))
+    total = spi.simps(kernely, kernelx)
+    lowlimit = np.where(-height_of_sample / 2. >= kernelx)[0][-1]
+    hilimit = np.where(height_of_sample / 2. <= kernelx)[0][0]
+    
+    area = spi.simps(kernely[lowlimit: hilimit + 1], kernelx[lowlimit: hilimit + 1])
+    return area / total
