@@ -24,6 +24,34 @@ def qcalc(angle, wavelength):
     wavelength -  wavelength of radiation (Angstrom)
     '''
     return 4 * np.pi * np.sin(angle * np.pi / 180) / wavelength
+    
+def qcalc2(omega,twotheta, xsi, wavelength):
+	'''
+	convert angles and wavelength (lambda) to Q vector.
+	coordinate system: 
+	y - along beam direction (in small angle approximation)
+	x - transverse to beam direction, in plane of sample
+	z - normal to sample plane.
+	the xy plane is equivalent to the sample plane.
+	
+	angle definitions
+	omega - angle of incidence to sample (in xy plane)
+	twotheta - angle between xy plane and reflected beam PLUS omega.
+	xsi - angle between reflected beam and yz plane.
+	returns a cartesian vector (Qx, Qy, Qz)
+	'''
+
+	#convert to radians	
+	omega = np.radians(omega)
+	twotheta = np.radians(twotheta)
+	xsi = np.radians(xsi)
+	#print "twotheta - omega=", cos(twotheta - omega) * cos(xsi), cos(omega)
+	qx = 2 * np.pi / wavelength * np.cos(twotheta - omega) * np.sin(xsi)
+	qy = 2 * np.pi / wavelength * (np.cos(twotheta - omega) * np.cos(xsi) - np.cos(omega))
+	qz = 2 * np.pi / wavelength * (np.sin(twotheta - omega) + np.sin(omega))
+	
+	return (qx, qy, qz)
+End
 
 def wavelength(q, angle):
     '''
