@@ -30,6 +30,9 @@ def height_of_beam_after_d2(d1, d2, L12, distance):
     
     dtheta = (d1 + d2) / 2 / L12
     return (dtheta * distance * 2) + d2
+    
+def actual_footprint(d1, d2, L12, L2S, angle)
+    return height_of_beam_after_d2(d1, d2, L12, L2S) / np.radians(angle)
 
 def slitoptimiser(footprint,
                      resolution, 
@@ -83,18 +86,18 @@ def slitoptimiser(footprint,
     else:
         multfactor = optimal_d2star / optimal_d1star
     
-    d1 = optimal_d1star * resolution / 0.68 * angle * np.pi / 180 * L12
+    d1 = optimal_d1star * resolution / 0.68 * np.radians(angle) * L12
     d2 = d1 * multfactor
     
     height_at_S4 = height_of_beam_after_d2(d1, d2, L12, L2S + LS4)
     height_at_detector = height_of_beam_after_d2(d1, d2, L12, L2S + LSD)
-    actual_footprint = height_of_beam_after_d2(d1, d2, L12, L2S) / (angle * np.pi / 180)
+    actual_footprint = height_of_beam_after_d2(d1, d2, L12, L2S) / np.radians(angle)
 
     if verbose:
         print '\nOUTPUT'
         if multfactor == 1:
             print 'Your desired resolution results in a smaller footprint than the sample supports.'
-            suggested_resolution =  resolution * footprint / (height_of_beam_after_d2(d1, d2, L2S) / (angle * np.pi / 180))
+            suggested_resolution =  resolution * footprint / (height_of_beam_after_d2(d1, d2, L2S) / np.radians(angle))
             print 'You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.'
         print '\nd1', d1, 'mm'
         print 'd2', d2, 'mm'
