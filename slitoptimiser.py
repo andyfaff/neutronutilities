@@ -31,7 +31,7 @@ def height_of_beam_after_d2(d1, d2, L12, distance):
     dtheta = (d1 + d2) / 2 / L12
     return (dtheta * distance * 2) + d2
     
-def actual_footprint(d1, d2, L12, L2S, angle)
+def actual_footprint(d1, d2, L12, L2S, angle):
     return height_of_beam_after_d2(d1, d2, L12, L2S) / np.radians(angle)
 
 def slitoptimiser(footprint,
