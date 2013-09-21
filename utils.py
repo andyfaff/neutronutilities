@@ -25,7 +25,7 @@ def qcalc(angle, wavelength):
     '''
     return 4 * np.pi * np.sin(angle * np.pi / 180) / wavelength
     
-def qcalc2(omega,twotheta, xsi, wavelength):
+def qcalc2(omega,twotheta, phi, wavelength):
 	'''
 	convert angles and wavelength (lambda) to Q vector.
 	coordinate system: 
@@ -37,7 +37,7 @@ def qcalc2(omega,twotheta, xsi, wavelength):
 	angle definitions
 	omega - angle of incidence to sample (in xy plane)
 	twotheta - angle between xy plane and reflected beam PLUS omega.
-	xsi - angle between reflected beam and yz plane.
+	phi - angle between reflected beam and yz plane.
 	returns a cartesian vector (Qx, Qy, Qz)
 	'''
 
@@ -46,12 +46,11 @@ def qcalc2(omega,twotheta, xsi, wavelength):
 	twotheta = np.radians(twotheta)
 	xsi = np.radians(xsi)
 	#print "twotheta - omega=", cos(twotheta - omega) * cos(xsi), cos(omega)
-	qx = 2 * np.pi / wavelength * np.cos(twotheta - omega) * np.sin(xsi)
-	qy = 2 * np.pi / wavelength * (np.cos(twotheta - omega) * np.cos(xsi) - np.cos(omega))
+	qx = 2 * np.pi / wavelength * np.cos(twotheta - omega) * np.sin(phi)
+	qy = 2 * np.pi / wavelength * (np.cos(twotheta - omega) * np.cos(phi) - np.cos(omega))
 	qz = 2 * np.pi / wavelength * (np.sin(twotheta - omega) + np.sin(omega))
 	
 	return (qx, qy, qz)
-End
 
 def wavelength(q, angle):
     '''
