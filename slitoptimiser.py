@@ -18,16 +18,7 @@ Andrew Nelson - 2013
 
 '''
 
-#slit1-slit2 distance (mm)
-L12 = 2859.5
-#slit2 - sample distance (mm)
-L2S = 276
-#sample - S5 distance (mm)
-LS4 = 290.5
-#sample detector (mm)
-LSD = 2500
-
-def height_of_beam_after_d2(d1, d2, distance):
+def height_of_beam_after_d2(d1, d2, L12, distance):
     '''
         Calculate total width of beam a given distance away from the last collimation slit. 
         d1 - opening of first collimation slit
@@ -40,7 +31,14 @@ def height_of_beam_after_d2(d1, d2, distance):
     dtheta = (d1 + d2) / 2 / L12
     return (dtheta * distance * 2) + d2
 
-def slitoptimiser(footprint, resolution, angle = 1.):
+def slitoptimiser(footprint,
+                     resolution, 
+                     angle = 1., 
+                      L12 = 2859.5,
+                      L2S = 276,
+                      LS4 = 290.5,
+                      LSD = 2500,
+                      verbose = True):
     '''
         Optimise slit settings for a given angular resolution, and a given footprint. 
         
@@ -48,15 +46,22 @@ def slitoptimiser(footprint, resolution, angle = 1.):
         resolution - fractional dtheta/theta resolution (FWHM)
         angle      - optional, angle of incidence in degrees
         
-        Note that this function is hardcoded for given instrument distances.
+        #slit1-slit2 distance (mm)
+        L12 = 2859.5
+        #slit2 - sample distance (mm)
+        L2S = 276
+        #sample - S5 distance (mm)
+        LS4 = 290.5
+        #sample detector (mm)
+        LSD = 2500        
     '''
-    
-    print '_____________________________________________'
-    print 'FOOTPRINT calculator - Andrew Nelson 2013'
-    print 'INPUT'
-    print 'footprint:', footprint, 'mm'
-    print 'fractional angular resolution (FWHM):', resolution
-    print 'theta:', angle, 'degrees'
+    if verbose:
+        print '_____________________________________________'
+        print 'FOOTPRINT calculator - Andrew Nelson 2013'
+        print 'INPUT'
+        print 'footprint:', footprint, 'mm'
+        print 'fractional angular resolution (FWHM):', resolution
+        print 'theta:', angle, 'degrees'
     
     d1star = lambda d2star : np.sqrt(1 - np.power(d2star, 2))
     L1star = 0.68 * footprint/L12/resolution
@@ -80,26 +85,26 @@ def slitoptimiser(footprint, resolution, angle = 1.):
     
     d1 = optimal_d1star * resolution / 0.68 * angle * np.pi / 180 * L12
     d2 = d1 * multfactor
-
-    print '\nOUTPUT'
     
-    if multfactor == 1:
-        print 'Your desired resolution results in a smaller footprint than the sample supports.'
-        suggested_resolution =  resolution * footprint / (height_of_beam_after_d2(d1, d2, L2S) / (angle * np.pi / 180))
-        print 'You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.'
+    height_at_S4 = height_of_beam_after_d2(d1, d2, L12, L2S + LS4)
+    height_at_detector = height_of_beam_after_d2(d1, d2, L12, L2S + LSD)
+    actual_footprint = height_of_beam_after_d2(d1, d2, L12, L2S) / (angle * np.pi / 180)
 
-    
-    height_at_S4 = height_of_beam_after_d2(d1, d2, L2S + LS4)
-    height_at_detector = height_of_beam_after_d2(d1, d2, L2S + LSD)
-    actual_footprint = height_of_beam_after_d2(d1, d2, L2S) / (angle * np.pi / 180)
+    if verbose:
+        print '\nOUTPUT'
+        if multfactor == 1:
+            print 'Your desired resolution results in a smaller footprint than the sample supports.'
+            suggested_resolution =  resolution * footprint / (height_of_beam_after_d2(d1, d2, L2S) / (angle * np.pi / 180))
+            print 'You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.'
+        print '\nd1', d1, 'mm'
+        print 'd2', d2, 'mm'
+        print '\nfootprint:', actual_footprint, 'mm'
+        print 'height at S4:', height_at_S4, 'mm'
+        print 'height at detector:', height_at_detector, 'mm'
+        print '\n[d2star', optimal_d2star, ']'
+        print '_____________________________________________'
 
-    print '\nd1', d1, 'mm'
-    print 'd2', d2, 'mm'
-    print '\nfootprint:', actual_footprint, 'mm'
-    print 'height at S4:', height_at_S4, 'mm'
-    print 'height at detector:', height_at_detector, 'mm'
-    print '\n[d2star', optimal_d2star, ']'
-    print '_____________________________________________'
+    return d1, d2
     
 if __name__ == '__main__':
     if len(sys.argv) < 3:
