@@ -18,21 +18,28 @@ Andrew Nelson - 2013
 
 '''
 
-def height_of_beam_after_d2(d1, d2, L12, distance):
+def height_of_beam_after_dx(d1, d2, L12, distance):
     '''
-        Calculate total width of beam a given distance away from the last collimation slit. 
+        Calculate total width of beam a given distance away from a collimation slit. 
+        if distance >= 0, then it's taken to be the distance after d2.
+        if distance < 0, then it's taken to be the distance before d1.
+        
         d1 - opening of first collimation slit
         d2 - opening of second collimation slit
-        distance - distance from last slit to a given position
+        distance - distance from first or last slit to a given position
         Units - equivalent distances (inches, mm, light years)
         
     '''
     
     dtheta = (d1 + d2) / 2 / L12
-    return (dtheta * distance * 2) + d2
+    if distance >= 0:
+        return (dtheta * distance * 2) + d2
+    else:
+        return (dtheta * abs(distance) * 2) + d1
+        
     
 def actual_footprint(d1, d2, L12, L2S, angle):
-    return height_of_beam_after_d2(d1, d2, L12, L2S) / np.radians(angle)
+    return height_of_beam_after_dx(d1, d2, L12, L2S) / np.radians(angle)
 
 def slitoptimiser(footprint,
                      resolution, 
@@ -89,15 +96,15 @@ def slitoptimiser(footprint,
     d1 = optimal_d1star * resolution / 0.68 * np.radians(angle) * L12
     d2 = d1 * multfactor
     
-    height_at_S4 = height_of_beam_after_d2(d1, d2, L12, L2S + LS4)
-    height_at_detector = height_of_beam_after_d2(d1, d2, L12, L2S + LSD)
-    actual_footprint = height_of_beam_after_d2(d1, d2, L12, L2S) / np.radians(angle)
+    height_at_S4 = height_of_beam_after_dx(d1, d2, L12, L2S + LS4)
+    height_at_detector = height_of_beam_after_dx(d1, d2, L12, L2S + LSD)
+    actual_footprint = height_of_beam_after_dx(d1, d2, L12, L2S) / np.radians(angle)
 
     if verbose:
         print '\nOUTPUT'
         if multfactor == 1:
             print 'Your desired resolution results in a smaller footprint than the sample supports.'
-            suggested_resolution =  resolution * footprint / (height_of_beam_after_d2(d1, d2, L2S) / np.radians(angle))
+            suggested_resolution =  resolution * footprint / (height_of_beam_after_dx(d1, d2, L2S) / np.radians(angle))
             print 'You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.'
         print '\nd1', d1, 'mm'
         print 'd2', d2, 'mm'
