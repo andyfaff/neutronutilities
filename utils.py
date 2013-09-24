@@ -6,16 +6,15 @@ import scipy.integrate as spi
 
 import sys
 
-def div(d1, d2, angle, L12 = 2859):
+def div(d1, d2, L12 = 2859):
     '''
-        returns the fractional angular resolution (FWHM) given a set of collimation conditions
+        returns the angular resolution (dtheta, FWHM) given a set of collimation conditions
         d1 - slit 1 opening (mm)
         d2 - slit 2 opening (mm)
-        angle - angle of incidence (degrees)
     '''
     
     divergence = 0.68 * 0.68 * (d1 * d1 + d2 * d2) / L12 / L12
-    return np.sqrt(divergence) / (angle * np.pi / 180)
+    return np.degrees(np.sqrt(divergence))
     
 def qcalc(angle, wavelength):
     '''
