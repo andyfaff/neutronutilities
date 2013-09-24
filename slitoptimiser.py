@@ -104,7 +104,7 @@ def slitoptimiser(footprint,
         print '\nOUTPUT'
         if multfactor == 1:
             print 'Your desired resolution results in a smaller footprint than the sample supports.'
-            suggested_resolution =  resolution * footprint / (height_of_beam_after_dx(d1, d2, L2S) / np.radians(angle))
+            suggested_resolution =  resolution * footprint / (height_of_beam_after_dx(d1, d2, L21, L2S) / np.radians(angle))
             print 'You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.'
         print '\nd1', d1, 'mm'
         print 'd2', d2, 'mm'
