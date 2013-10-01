@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from __future__ import division
+
 import numpy as np
 from scipy.optimize import minimize_scalar
 import sys
@@ -66,12 +66,12 @@ def slitoptimiser(footprint,
         LSD = 2500        
     '''
     if verbose:
-        print '_____________________________________________'
-        print 'FOOTPRINT calculator - Andrew Nelson 2013'
-        print 'INPUT'
-        print 'footprint:', footprint, 'mm'
-        print 'fractional angular resolution (FWHM):', resolution
-        print 'theta:', angle, 'degrees'
+        print('_____________________________________________')
+        print('FOOTPRINT calculator - Andrew Nelson 2013')
+        print('INPUT')
+        print('footprint:', footprint, 'mm')
+        print('fractional angular resolution (FWHM):', resolution)
+        print('theta:', angle, 'degrees')
     
     d1star = lambda d2star : np.sqrt(1 - np.power(d2star, 2))
     L1star = 0.68 * footprint/L12/resolution
@@ -80,7 +80,7 @@ def slitoptimiser(footprint,
     
     res = minimize_scalar(gseekfun, method = 'bounded', bounds = (0, 1))
     if res['success'] is False:
-        print 'ERROR: Couldnt find optimal solution, sorry'
+        print('ERROR: Couldnt find optimal solution, sorry')
         return None
         
     optimal_d2star = res['x']
@@ -101,25 +101,25 @@ def slitoptimiser(footprint,
     actual_footprint = height_of_beam_after_dx(d1, d2, L12, L2S) / np.radians(angle)
 
     if verbose:
-        print '\nOUTPUT'
+        print('OUTPUT')
         if multfactor == 1:
-            print 'Your desired resolution results in a smaller footprint than the sample supports.'
+            print('Your desired resolution results in a smaller footprint than the sample supports.')
             suggested_resolution =  resolution * footprint / (height_of_beam_after_dx(d1, d2, L21, L2S) / np.radians(angle))
-            print 'You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.'
-        print '\nd1', d1, 'mm'
-        print 'd2', d2, 'mm'
-        print '\nfootprint:', actual_footprint, 'mm'
-        print 'height at S4:', height_at_S4, 'mm'
-        print 'height at detector:', height_at_detector, 'mm'
-        print '\n[d2star', optimal_d2star, ']'
-        print '_____________________________________________'
+            print('You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.')
+        print('d1', d1, 'mm')
+        print('d2', d2, 'mm')
+        print('footprint:', actual_footprint, 'mm')
+        print('height at S4:', height_at_S4, 'mm')
+        print('height at detector:', height_at_detector, 'mm')
+        print('[d2star', optimal_d2star, ']')
+        print('_____________________________________________')
 
     return d1, d2
     
 if __name__ == '__main__':
     if len(sys.argv) < 3:
-        print 'Usage:\n\
+        print('Usage:\n\
             python slitoptimiser.py footprint relative_resolution [angle]\n\
-            python slitoptimiser.py 50 0.04 [2]'
+            python slitoptimiser.py 50 0.04 [2]')
     else:
         slitoptimiser(*[float(val) for val in sys.argv[1:]])

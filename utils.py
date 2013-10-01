@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from __future__ import division
+
 import numpy as np
 import scipy.stats as ss
 import scipy.integrate as spi
@@ -9,8 +9,9 @@ import sys
 def div(d1, d2, L12 = 2859):
     '''
         returns the angular resolution (dtheta, FWHM) given a set of collimation conditions
-        d1 - slit 1 opening (mm)
-        d2 - slit 2 opening (mm)
+        d1 - slit 1 opening
+        d2 - slit 2 opening 
+        L12 - distance between slits
     '''
     
     divergence = 0.68 * 0.68 * (d1 * d1 + d2 * d2) / L12 / L12
