@@ -20,26 +20,46 @@ Andrew Nelson - 2013
 
 def height_of_beam_after_dx(d1, d2, L12, distance):
     '''
-        Calculate total width of beam a given distance away from a collimation slit. 
+        Calculate the widths of beam a given distance away from a collimation slit. 
+
         if distance >= 0, then it's taken to be the distance after d2.
         if distance < 0, then it's taken to be the distance before d1.
         
-        d1 - opening of first collimation slit
-        d2 - opening of second collimation slit
-        distance - distance from first or last slit to a given position
+        Parameters:
+            d1 - opening of first collimation slit
+            d2 - opening of second collimation slit
+            L12 - distance between first and second collimation slits
+            distance - distance from first or last slit to a given position
         Units - equivalent distances (inches, mm, light years)
         
+        Returns:
+            (umbra, penumbra)
+            
     '''
     
-    dtheta = (d1 + d2) / 2 / L12
+    alpha = (d1 + d2) / 2. / L12
+    beta = abs(d1 - d2) / 2. / L12
     if distance >= 0:
-        return (dtheta * distance * 2) + d2
+        return (beta * distance * 2) + d2, (alpha * distance * 2) + d2
     else:
-        return (dtheta * abs(distance) * 2) + d1
+        return (beta * abs(distance) * 2) + d1, (alpha * abs(distance) * 2) + d1
         
     
 def actual_footprint(d1, d2, L12, L2S, angle):
-    return height_of_beam_after_dx(d1, d2, L12, L2S) / np.radians(angle)
+    '''
+        Calculate the actual footprint on a sample.
+        Parameters:
+            d1 - opening of first collimation slit
+            d2 - opening of second collimation slit
+            L12 - distance between first and second collimation slits
+            L2S - distance from second collimation slit to sample
+        
+        Returns:
+            (umbra_footprint, penumbra_footprint)
+            
+    '''
+    umbra, penumbra = height_of_beam_after_dx(d1, d2, L12, L2S)
+    return  umbra / np.radians(angle), penumbra / np.radians(angle)
 
 def slitoptimiser(footprint,
                      resolution, 
@@ -96,19 +116,19 @@ def slitoptimiser(footprint,
     d1 = optimal_d1star * resolution / 0.68 * np.radians(angle) * L12
     d2 = d1 * multfactor
     
-    height_at_S4 = height_of_beam_after_dx(d1, d2, L12, L2S + LS4)
-    height_at_detector = height_of_beam_after_dx(d1, d2, L12, L2S + LSD)
-    actual_footprint = height_of_beam_after_dx(d1, d2, L12, L2S) / np.radians(angle)
+    tmp, height_at_S4 = height_of_beam_after_dx(d1, d2, L12, L2S + LS4)
+    tmp, height_at_detector = height_of_beam_after_dx(d1, d2, L12, L2S + LSD)
+    tmp, _actual_footprint = actual_footprint(d1, d2, L12, L2S, angle)
 
     if verbose:
         print('OUTPUT')
         if multfactor == 1:
             print('Your desired resolution results in a smaller footprint than the sample supports.')
-            suggested_resolution =  resolution * footprint / (height_of_beam_after_dx(d1, d2, L21, L2S) / np.radians(angle))
+            suggested_resolution =  resolution * footprint / _actual_footprint
             print('You can increase flux using a resolution of', suggested_resolution, 'and still keep the same footprint.')
         print('d1', d1, 'mm')
         print('d2', d2, 'mm')
-        print('footprint:', actual_footprint, 'mm')
+        print('footprint:', _actual_footprint, 'mm')
         print('height at S4:', height_at_S4, 'mm')
         print('height at detector:', height_at_detector, 'mm')
         print('[d2star', optimal_d2star, ']')

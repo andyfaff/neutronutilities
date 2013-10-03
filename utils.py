@@ -8,14 +8,30 @@ import sys
 
 def div(d1, d2, L12 = 2859):
     '''
-        returns the angular resolution (dtheta, FWHM) given a set of collimation conditions
+        returns the angular resolutions given a set of collimation conditions
+        Parameters:
+
         d1 - slit 1 opening
         d2 - slit 2 opening 
         L12 - distance between slits
+        
+        Returns:
+            (dtheta, alpha, beta)
+
+
+        dtheta is the FWHM of the Gaussian approximation to the trapezoidal resolution function
+        alpha is the angular divergence of the penumbra
+        beta is the angular divergence of the umbra
+        When calculating dtheta/theta values for resolution, then dtheta is the value you need to use.
+        See equations 11-14 in:
+        de Haan, V.-O.; de Blois, J.; van der Ende, P.; Fredrikze, H.; van der Graaf, A.; Schipper, M.; van Well, A. A. & J., v. d. Z. ROG, the neutron reflectometer at IRI Delft Nuclear Instruments and Methods in Physics Research A, 1995, 362, 434-453
+        
     '''
     
     divergence = 0.68 * 0.68 * (d1 * d1 + d2 * d2) / L12 / L12
-    return np.degrees(np.sqrt(divergence))
+    alpha = (d1 + d2) / 2. / L12
+    beta = abs(d1 - d2) / 2. / L12
+    return np.degrees(np.sqrt(divergence)), np.degrees(alpha), np.degrees(beta)
     
 def qcalc(angle, wavelength):
     '''
